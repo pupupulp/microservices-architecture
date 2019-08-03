@@ -1,0 +1,26 @@
+version: '3'
+services:
+  jenkins:
+    user: root
+    image: jenkinsci/blueocean
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 1s
+        max_attempts: 5
+        window: 120s
+      placement:
+        constraints: [node.role == manager]
+    ports:
+      - 8080:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins_data:/var/jenkins_home
+      - /usr/src:/usr/src
+networks:
+  default:
+    external:
+      name: services_network
+volumes:
+  jenkins_data:

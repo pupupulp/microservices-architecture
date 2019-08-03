@@ -272,3 +272,36 @@ $   service apm-server start
 ```
 
 + For setting up APM node on your app please follow instructions on Kibana's [APM Tutorial](http://127.0.0.1:5601/app/kibana#/home/tutorial/apm?_g=(time:(from:now-24h,mode:quick,to:now))&_a=).
+
+## Jenkins Setup
+
++ Deploy Jenkins 
+> Note : A password will be shown on jenkins container logs, use it for first time setup on jenkins. You can also save it on other location for later use.
+
+```cli
+$	TOOLS_SETUP_DIR=tools \
+	STACK_NAME=services_tools \
+	&& docker stack deploy -c ./${TOOLS_SETUP_DIR}/docker-compose.jenkins.yaml ${STACK_NAME}
+```
+
++ Check if Jenkins is deployed, might take some time
+
+```cli
+$   docker service ls
+```
+
++ Once deployed access Jenkins on http://127.0.0.1:8080, input the password shown on the container logs mentioned on previous step. Setup Jenkins accordingly and proceed to login.
+
+### Setting Up a Bitbucket Pipeline (Optional Guide)
+
++ On the dashboard navigate to **Manage Jenkins>Manage Plugins** then click on **Available** tab and search for **[Bitbucket Push and Pull Request Plugin](https://wiki.jenkins.io/display/JENKINS/Bitbucket+Push+And+Pull+Request+Plugin)** and install it.
+
++ On your bitbucket repository nagivate to **Settings>Webhooks** then click **Add webhook**, set title to **Jenkins** and URL to **http://YOUR_JENKINS_URL/bitbucket-hook/** then adjust triggers to your likings, the default is _Repository push_.
+
++ After setting up on bitbucket repositry get back to jenkins and on dashboard navigate to **New Item**, set item name to **REPOSITORY_NAME** and click **Pipeline** then save. A configuration page would appear after. On the **Build Triggers** tab tick **Build with BitBucket Push and Pull Request Plugin** then add triggers similar to the triggers you set on the repository settings from the previous step. On the **Pipeline** tab set definition to **Pipeline script from SCM** and a configuration would appear below. Set SCM to **Git**, then on repository URL put the URL for cloning your repository. On the credentials select if you already have, if not click **Add>Jenkins** set values for username, password, ID and description field and click **Add** on the bottom, this would appear on the selection right after. On the branches to build set branch specifier to **origin/master**. Finally click **Save**.
+
++ Navigate **Back to Dashboard**, you will see your newly created pipeline.
+
++ Navigate to **Open Blue Ocean**, a modernized UI for jenkins would appear which contains all the pipelines created. Click on your newly created pipeline from the list, then click **Run**, this is required to initialized connection between bitbucket and jenkins through the webhook.
+
++ Make sure you have a **Jenkinsfile** on the repository you used, this would be the recipe for the different stages of the pipeline.
