@@ -1,0 +1,42 @@
+version: '3'
+services:
+  elasticsearch:
+    image: elasticsearch:6.7.0
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    environment:
+      - ELASTIC_PASSWORD=changeme
+  kibana:
+    image: kibana:6.7.0
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    ports:
+      - '5601:5601'
+    depends_on:
+      - elasticsearch 
+  logstash:
+    image: logstash:6.7.0
+    environment:
+      - STDOUT=true
+    depends_on:
+      - elasticsearch
+      - kibana
+    command: 'logstash -e "input { udp { port => 5000 } } output { elasticsearch { hosts => elasticsearch } }"'
+  logspout:
+    image: gliderlabs/logspout
+    command: 'udp://logstash:5000'
+    volumes:
+      - '/var/run/docker.sock:/tmp/docker.sock'
+    depends_on:
+      - elasticsearch
+      - logstash
+      - kibana
+networks:
+  default:
+    external:
+      name: services_network
+volumes:
+  elasticsearch_data:
