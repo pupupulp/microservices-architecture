@@ -1,0 +1,25 @@
+version: '3'
+services:
+  portainer:
+    image: portainer/portainer
+    command: -H unix:///var/run/docker.sock
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 1s
+        max_attempts: 5
+        window: 120s
+      placement:
+        constraints: [node.role == manager]
+    ports:
+      - 9000:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+networks:
+  default:
+    external:
+      name: services_network
+volumes:
+  portainer_data:
