@@ -350,6 +350,12 @@ server {
 }
 ```
 
++ Link sites-available to sites-enabled.
+
+```cli
+$   ln -s /etc/nginx/sites-available/<app-name> /etc/nginx/sites-enabled/
+```
+
 + Restart NGINX to apply configuration.
 
 ```cli
