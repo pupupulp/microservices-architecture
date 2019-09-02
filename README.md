@@ -305,3 +305,53 @@ $   docker service ls
 + Navigate to **Open Blue Ocean**, a modernized UI for jenkins would appear which contains all the pipelines created. Click on your newly created pipeline from the list, then click **Run**, this is required to initialized connection between bitbucket and jenkins through the webhook.
 
 + Make sure you have a **Jenkinsfile** on the repository you used, this would be the recipe for the different stages of the pipeline.
+
+## NGINX Setup
+
++ On your host machine install and run NGINX using the following command.
+
+```cli
+$   apt install nginx \
+    && service nginx start
+```
+
++ Check if NGINX is running.
+
+```cli
+$   service nginx status
+```
+
++ To setup NGINX as reverse proxy for your NodeJS application, create **\<app-name\>** file under /etc/nginx/sites-available.
+
+```cli
+$   touch /etc/nginx/sites-available/<app-name> 
+```
+
++ Open the created file and add the following configuration.
+
+```bash
+server {
+  listen 80;
+  listen 443 ssl;
+  server_name <app-domain>;
+  
+  ssl_certificate  /etc/nginx/ssl/<app-name>.crt
+  ssl_certificate_key /etc/nginx/ssl/<app-name>.key
+
+  location / {
+    proxy_pass http://127.0.0.1:<app-port>;
+    proxy_http_version 1.1;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $http_host;
+    proxy_cache_bypass $http_upgrade;
+  }
+}
+```
+
++ Restart NGINX to apply configuration.
+
+```cli
+$   service nginx restart
+```
