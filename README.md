@@ -54,7 +54,7 @@ $    sudo su
 
 ```cli
 $   chmod +x dependency-installation.sh \
-	&& ./dependency-installation.sh
+    && ./dependency-installation.sh
 ```
 
 ## Some take notes before actual setup
@@ -75,8 +75,8 @@ $   chmod +x dependency-installation.sh \
 > Note : If there are more than one IP address present on your server, append **--advertise-addr \<ip-addr\>** as arg on swarm init command and replace **\<ip-addr\>** with the IP address you want to use as seen below.
 
 ```cli
-$	docker swarm init
-$	docker swarm init --advertise-addr <ip-addr> 
+$   docker swarm init
+$   docker swarm init --advertise-addr <ip-addr> 
 ```
 
 + Check if swarm was created
@@ -93,8 +93,8 @@ $   docker node ls
 > Note : On the compose file of services that need to see each other, add the created network name and add **external** property to it that is set to true. See compose files on the repo for example.
 
 ```cli
-$	NETWORK_NAME=services_network \
-	&& docker network create --driver=overlay ${NETWORK_NAME}
+$   NETWORK_NAME=services_network \
+    && docker network create --driver=overlay ${NETWORK_NAME}
 ```
 
 + Check if network was created
@@ -108,9 +108,9 @@ $   docker network ls
 + Deploy Portainer monitoring tool for docker
 
 ```cli
-$	TOOLS_SETUP_DIR=tools \
-	STACK_NAME=services_tools \
-	&& docker stack deploy -c ./${TOOLS_SETUP_DIR}/docker-compose.portainer.yaml ${STACK_NAME}
+$   TOOLS_SETUP_DIR=tools \
+    STACK_NAME=services_tools \
+    && docker stack deploy -c ./${TOOLS_SETUP_DIR}/docker-compose.portainer.yaml ${STACK_NAME}
 ```
 
 + Check if Portainer is deployed, might take some time
@@ -129,9 +129,9 @@ $   docker service ls
 > Note : If elasticsearch does not start you might need to run this `sysctl -w vm.max_map_count=262144` or if you want that setting to persist on reboot, open **/etc/sysctl.conf** then add **vm.max_map_count=262144** finally run `service sysctl restart` to apply changes.
 
 ```cli
-$	TOOLS_SETUP_DIR=tools \
-	STACK_NAME=services_tools \
-	&& docker stack deploy -c ./${TOOLS_SETUP_DIR}/docker-compose.elk.yaml ${STACK_NAME}
+$   TOOLS_SETUP_DIR=tools \
+    STACK_NAME=services_tools \
+    && docker stack deploy -c ./${TOOLS_SETUP_DIR}/docker-compose.elk.yaml ${STACK_NAME}
 ```
 
 + Check if ELK stack is deployed, might take some time
@@ -275,15 +275,50 @@ $   service apm-server start
 
 + For setting up APM node on your app please follow instructions on Kibana's [APM Tutorial](http://127.0.0.1:5601/app/kibana#/home/tutorial/apm?_g=(time:(from:now-24h,mode:quick,to:now))&_a=).
 
+## NodeJS Setup
+
++ Install NodeJS and NPM to start developing applications, you can replace **NODE_VER** with the version you want.
+
+```cli
+$   NODE_VER=12.x \
+    curl -sL https://deb.nodesource.com/setup_${NODE_VER} \
+    apt install -y nodejs npm build-essential
+```
+
+## Metabase Setup
+
++ Create persistent volumes.
+> Note : Dont remove this volume on production to avoid data loss, the data would persist but still.
+
+```cli
+$   docker volume create -d local-persist -o mountpoint=/var/lib/metabase/data --name=metabase_data
+```
+
++ Build custom image for Metabase, to add support for FirebirdSQL.
+
+```cli
+$   METABASE_SETUP_DIR=tools/metabase \
+    OWNER=tools \
+    && docker build -t ${OWNER}/metabase:latest ./${METABASE_SETUP_DIR}/.
+```
+
++ Deploy Metabase.
+
+```cli
+$   TOOLS_SETUP_DIR=tools \
+    STACK_NAME=services_tools \
+    && docker stack deploy -c ./${TOOLS_SETUP_DIR}/docker-compose.metabase.yaml ${STACK_NAME}
+```
+
 ## Jenkins Setup
 
 + Deploy Jenkins 
 > Note : A password will be shown on jenkins container logs, use it for first time setup on jenkins. You can also save it on other location for later use.
 
 ```cli
-$	TOOLS_SETUP_DIR=tools \
-	STACK_NAME=services_tools \
-	&& docker stack deploy -c ./${TOOLS_SETUP_DIR}/docker-compose.jenkins.yaml ${STACK_NAME}
+$   TOOLS_SETUP_DIR=tools \
+	  STACK_NAME=services_tools \
+	  && docker stack deploy -c ./${TOOLS_SETUP_DIR}/docker-compose.jenkins.yaml ${STACK_NAME}
 ```
 
 + Check if Jenkins is deployed, might take some time
