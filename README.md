@@ -67,6 +67,8 @@ $   chmod +x dependency-installation.sh \
 
 + Its always better to deploy databases on different swarm node that is preferrably on a different server as well. 
 
++ For NGINX timeouts, it is advisable to place the configurations for timeouts on the **conf.d** folder under a single file for single responsibility. 
+
 ## Docker Swarm Setup
 
 + Initialize docker swarm
