@@ -363,3 +363,21 @@ $   ln -s /etc/nginx/sites-available/<app-name> /etc/nginx/sites-enabled/
 ```cli
 $   service nginx restart
 ```
+
+## About
+
+### Contributing
+
+Pull requests and stars are always welcome. For bugs and feature requests, please [create an issue](https://github.com/pupupulp/microservices-architecture/issues/new).
+
+### Contributors
+
+### Author
+
+**Eagan Martin**
+- [Github](https://github.com/pupupulp)
+- [LinkedIn]()
+
+### License
+
+Copyright © 2019, [Eagan Martin](https://github.com/pupupulp). Release under the [MIT License](https://github.com/pupupulp/microservices-architecture/blob/master/LICENSE)
